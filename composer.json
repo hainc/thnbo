@@ -1,0 +1,15 @@
+{
+    "name": "yfx/thnbo",
+    "authors": [
+        {
+            "name": "yfx",
+            "email": "26341012@qq.com"
+        }
+    ],
+    "require": { },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    }
+}
