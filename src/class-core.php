@@ -75,7 +75,8 @@ class Core {
     
 
     public function handle_thumbnail( $post_id, $post ) {
-        if ( 'delete' === @$_GET['thnbo_type'] ) {
+        $thnbo_type = $_GET['thnbo_type'] ?? '';
+        if ( 'delete' === $thnbo_type ) {
             delete_post_meta( $post_id, 'cut_id' );
             delete_post_meta( $post_id, 'cut_theme' );
 
@@ -119,7 +120,7 @@ class Core {
             if ( ! has_post_thumbnail( $post_id ) ) {
              $post_content = get_the_content( null, null, $post );
              preg_match_all( '/<img[^>]*?src="([^"]*?)"[^>]*?>/i', $post_content, $match );
-             if ( ! key_exists( 1, $match ) || ! key_exists( 0, $match[1] ) || empty( $match[1][0] ) ) {
+             if ( ! array_key_exists( 1, $match ) || ! array_key_exists( 0, $match[1] ) || empty( $match[1][0] ) ) {
                  return;
              }
              $tmp_file_name = pathinfo( $match[1][0], PATHINFO_FILENAME ) . '_thumbnail.png';
@@ -153,7 +154,8 @@ class Core {
     
                 $in       = $tmp_file;
                 $out_path = wp_upload_dir()['path'] . '/' . $tmp_file_name;
-                if ( 'delete' !== @$_GET['thnbo_type'] ) {
+                $thnbo_type = $_GET['thnbo_type'] ?? '';
+                if ( 'delete' !== $thnbo_type ) {
                     $editor->open( $image1, $in );
                     if ( $this->_cut_type === Cut_Type::SMART ) {
                         $editor->resizeFill( $image1, $theme_meta['width'], $theme_meta['height'], 'smart' );

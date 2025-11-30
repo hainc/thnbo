@@ -6,7 +6,9 @@
             "email": "26341012@qq.com"
         }
     ],
-    "require": { },
+    "require": {
+        "php": "^7.4|^8.0"
+    },
     "autoload": {
         "classmap": [
             "src/"

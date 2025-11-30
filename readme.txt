@@ -4,8 +4,8 @@ Donate link: https://www.yfx.top
 Tags: thnbo
 Requires at least: 3.5
 Tested up to: 6.0.3
-Requires PHP: 5.6
-Stable tag: 1.5
+Requires PHP: 7.4
+Stable tag: 1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,11 +20,19 @@ ThnBo是一款针对WordPress开发的缩略图美化插件,为广大站长提�
 安装后启用即可，该插件自动对所有发布和更新操作生效
 
 == Changelog ==
+= 1.6 =
+1.优化PHP版本兼容性，最低支持PHP 7.4
+2.全面兼容PHP 8.x版本
+3.添加PHP版本检查，不满足版本要求时显示警告
+4.优化代码结构，提高稳定性
+5.更新composer.json中的PHP版本要求
+
 = 1.5 =
 1.新增关闭设置项不显示相关内容
 2.新增默认关闭设置不显示文章Mete Box
 3.修复文章Mete Box选择关闭点击发布/更新文章报错
 4.修复后台图片不显示问题
+5.兼容PHP 7.4和PHP 8.x
 
 = 1.4 =
 1.优化默认美化缩略图为资源模板

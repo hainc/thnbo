@@ -5,7 +5,7 @@
  * @package WP_REAL_PERSON_VERIFY
  */
 
-define( 'THNBO_VERSION', '1.5' );
+define( 'THNBO_VERSION', '1.6' );
 
 define( 'THNBO_ROOT_PATH', plugin_dir_path( __FILE__ ) );
 

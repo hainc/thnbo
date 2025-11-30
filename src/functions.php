@@ -23,7 +23,8 @@ function thnbo_get_option( string $name = '' ) {
     );
 
     if ( ! empty( $name ) ) {
-        return wp_parse_args( $thnbo_options, $defaults )[ $name ];
+        $options = wp_parse_args( $thnbo_options, $defaults );
+    return $options[ $name ];
     }
 
     return wp_parse_args( $thnbo_options, $defaults );
