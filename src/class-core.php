@@ -191,6 +191,17 @@ class Core {
                         update_post_meta( $post_id, 'cut_theme', $this->_cut_theme );
                     }
                 }
+                
+                // 删除临时文件
+                if ( file_exists( $tmp_file ) ) {
+                    unlink( $tmp_file );
+                }
+                
+                // 删除处理过程中生成的临时文件
+                $process_tmp_file = THNBO_ROOT_PATH . 'tmp/tmp.png';
+                if ( file_exists( $process_tmp_file ) ) {
+                    unlink( $process_tmp_file );
+                }
             }
         }
     }
