@@ -4,7 +4,7 @@
  * Description: 一款针对WordPress开发的缩略图美化插件,为广大站长提供缩略图的美化便利。
  * Author: 源分享
  * Author URI:https://www.yfx.top
- * Version: 1.6
+ * Version: 1.7
  * License: GPLv3 or later
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  */

@@ -5,7 +5,7 @@ Tags: thnbo
 Requires at least: 3.5
 Tested up to: 6.0.3
 Requires PHP: 7.4
-Stable tag: 1.6
+Stable tag: 1.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,6 +20,18 @@ ThnBo是一款针对WordPress开发的缩略图美化插件,为广大站长提�
 安装后启用即可，该插件自动对所有发布和更新操作生效
 
 == Changelog ==
+
+= 1.7 =
+1.修复了可能与其他插件或项目发生的图片处理库冲突问题。
+2.新增 腾讯云 COS 上传支持：
+    ·图片在裁剪处理后将自动上传至 COS 并直接应用
+    ·上传成功后会自动删除本地缓存文件
+    ·WordPress 媒体库中将显示 COS 的直链地址
+    ·注意：启用 COS 支持前需先安装并启用官方腾讯云 COS 插件
+参考资源：
+    ·插件说明文档：https://cloud.tencent.com/document/product/436/41153
+    ·插件下载地址：https://cosbrowser.cloud.tencent.com/code/tencent-cloud-cos.zip
+
 = 1.6 =
 1.优化PHP版本兼容性，最低支持PHP 7.4
 2.全面兼容PHP 8.x版本
