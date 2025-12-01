@@ -20,6 +20,7 @@ function thnbo_get_option( string $name = '' ) {
     $defaults      = array(
         'cut_type'  => Cut_Type::CENTER,
         'cut_theme' => Cut_Theme::RESOURCE,
+        'use_cos'   => false,
     );
 
     if ( ! empty( $name ) ) {

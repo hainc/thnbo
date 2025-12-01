@@ -23,15 +23,40 @@ add_action( 'admin_menu', function () {
             wp_die( '权限不足' );
         }
 
+        // 获取原始选项，不包含默认值
+        $original_options = get_option( 'thnbo_options', array() );
+        
+        // 合并默认值，用于显示表单
         $thnbo_options = thnbo_get_option();
 
         if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
-            $thnbo_options['cut_type'] = sanitize_text_field( $_POST['cut_type'] );
-            $thnbo_options['cut_theme'] = sanitize_text_field( $_POST['cut_theme'] );
-            update_option( 'thnbo_options', $thnbo_options );
+            // 验证 nonce
+            if ( ! isset( $_POST['thnbo_nonce'] ) || ! wp_verify_nonce( $_POST['thnbo_nonce'], 'thnbo_save_settings' ) ) {
+                echo '<div class="notice notice-error settings-error is-dismissible"><p><strong>安全验证失败，请重试。</strong></p></div>';
+            } else {
+                // 更新选项值
+                $original_options['cut_type'] = sanitize_text_field( $_POST['cut_type'] );
+                $original_options['cut_theme'] = sanitize_text_field( $_POST['cut_theme'] );
+                $original_options['use_cos'] = isset( $_POST['use_cos'] ) ? true : false;
+                
+                // 保存更新后的选项
+                update_option( 'thnbo_options', $original_options );
+                
+                // 重新获取合并了默认值的选项，用于显示成功消息后的表单
+                $thnbo_options = wp_parse_args( $original_options, array(
+                    'cut_type'  => Cut_Type::CENTER,
+                    'cut_theme' => Cut_Theme::RESOURCE,
+                    'use_cos'   => false,
+                ) );
 
-            echo '<div class="notice notice-success settings-error is-dismissible"><p><strong>设置已保存。</strong></p></div>';
+                echo '<div class="notice notice-success settings-error is-dismissible"><p><strong>设置已保存。</strong></p></div>';
+            }
         }
+        
+        // 检查 tencentcloud-cos 插件是否已启用
+        // 使用更可靠的方法，避免依赖 is_plugin_active 函数
+        $active_plugins = (array) get_option( 'active_plugins', array() );
+        $cos_plugin_active = in_array( 'tencentcloud-cos/tencentcloud-cos.php', $active_plugins );
         ?>
       <div class="container-laobuluo-main">
         <div class="laobuluo-wbs-header" style="margin-bottom: 15px;">
@@ -156,6 +181,23 @@ add_action( 'admin_menu', function () {
                       </div>
                     </div>
                     </div>
+                    <div class="layui-form-item">
+                      <label class="layui-form-label">使用腾讯云COS</label>
+                      <div class="layui-input-block">
+                        <input type="checkbox" name="use_cos" lay-skin="switch" lay-text="开启|关闭" <?php checked( $thnbo_options['use_cos'], true ); ?>>
+                      </div>
+                      <div class="layui-input-block">
+                        <div class="layui-form-mid layui-word-aux">
+                          <?php if ( $thnbo_options['use_cos'] ) : ?>
+                              <?php if ( ! $cos_plugin_active ) : ?>
+                                  <span style="color: red;">请安装并启用 tencentcloud-cos 插件。</span>
+                              <?php else : ?>
+                                  <span style="color: green;">tencentcloud-cos 插件已启用。</span>
+                              <?php endif; ?>
+                          <?php endif; ?>
+                        </div>
+                      </div>
+                    </div>
                       <?php
                       /**
                        * 为设置表单添加新字段
@@ -167,6 +209,7 @@ add_action( 'admin_menu', function () {
                       <div class="layui-input-block"><input type="submit" name="submit" value="保存设置" class=" layui-btn"
                                                             lay-submit lay-filter="formDemo"/></div>
                     </div>
+                    <?php wp_nonce_field( 'thnbo_save_settings', 'thnbo_nonce' ); ?>
                     <input type="hidden" name="type" value="cos_info_set">
                   </form>
                 </div>

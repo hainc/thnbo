@@ -206,8 +206,20 @@ class Core {
     private function _insert_attachment( string $file, int $id ) {
         $dirs       = wp_upload_dir();
         $filetype   = wp_check_filetype( $file );
+        
+        // 检查是否使用COS
+        $use_cos = thnbo_get_option( 'use_cos' );
+        $cos_url_path = get_option( 'upload_url_path' );
+        
+        // 如果使用COS且cos_url_path已设置，则使用COS URL作为guid
+        if ( $use_cos && ! empty( $cos_url_path ) ) {
+            $guid = $cos_url_path . '/' . _wp_relative_upload_path( $file );
+        } else {
+            $guid = $dirs['baseurl'] . '/' . _wp_relative_upload_path( $file );
+        }
+        
         $attachment = array(
-            'guid'           => $dirs['baseurl'] . '/' . _wp_relative_upload_path( $file ),
+            'guid'           => $guid,
             'post_mime_type' => $filetype['type'],
             'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $file ) ),
             'post_content'   => '',
