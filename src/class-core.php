@@ -120,6 +120,51 @@ class Core {
         
         // 仅当主题未关闭时执行
         if ( $this->_cut_theme !== Cut_Theme::CLOSE ) {
+            // 获取现有的缩略图相关ID
+            $cut_id = get_post_meta( $post_id, 'cut_id', true );
+            $thumbnail_id = get_post_meta( $post_id, '_thumbnail_id', true );
+            
+            // 检查 _thumbnail_id 指向的文件是否存在
+            if ( ! empty( $thumbnail_id ) ) {
+                $thumbnail_file = get_attached_file( $thumbnail_id );
+                if ( ! $thumbnail_file || ! file_exists( $thumbnail_file ) ) {
+                    // 如果 _thumbnail_id 指向的文件不存在，删除该meta
+                    delete_post_meta( $post_id, '_thumbnail_id' );
+                    $thumbnail_id = '';
+                }
+            }
+            
+            // 检查 cut_id 指向的文件是否存在
+            $cut_exists = false;
+            if ( ! empty( $cut_id ) ) {
+                $cut_file = get_attached_file( $cut_id );
+                if ( $cut_file && file_exists( $cut_file ) ) {
+                    $cut_exists = true;
+                } else {
+                    // 如果 cut_id 指向的文件不存在，删除对应的meta
+                    delete_post_meta( $post_id, 'cut_id' );
+                    delete_post_meta( $post_id, 'cut_theme' );
+                    $cut_id = '';
+                }
+            }
+            
+            // 如果 cut_id 存在且文件有效，则继续使用该缩略图
+            if ( $cut_exists ) {
+                // 如果 cut_id 和 _thumbnail_id 不一致，将 _thumbnail_id 设置为 cut_id
+                if ( $cut_id !== $thumbnail_id ) {
+                    set_post_thumbnail( $post_id, $cut_id );
+                }
+                return;
+            }
+            
+            // 如果 cut_id 不存在或文件无效，但 _thumbnail_id 存在且文件有效，则使用该图片并更新 cut_id
+            if ( ! empty( $thumbnail_id ) ) {
+                update_post_meta( $post_id, 'cut_id', $thumbnail_id );
+                update_post_meta( $post_id, 'cut_theme', $this->_cut_theme );
+                return;
+            }
+            
+            // 生成新的缩略图
             $this->_generate_thumbnail( $post_id, $post );
         }
     }
