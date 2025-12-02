@@ -52,6 +52,9 @@ class Core {
         
         // 注册后台元框
         add_action( 'admin_init', [ $this, 'add_metabox' ] );
+        
+        // 保存文章元数据
+        add_action( 'save_post', [ $this, 'save_metabox' ] );
     }
 
     /**
@@ -85,12 +88,54 @@ class Core {
                     if ( $cut_theme === Cut_Theme::BILL ) {
                         echo 'checked';
                     }
-                    echo '/>海报</p><p>注意：<br/>1、生成后无法修改，请谨慎选择；<br/>2、自动替换特色图像；<br/>3、自动保存到媒体库中。</p>';
+                    echo '/>海报</p>';
+                    
+                    // 添加"生成新的"复选框
+                    echo '<p><input type="checkbox" name="thnbo_generate_new" value="1" id="thnbo_generate_new"/>
+                    <label for="thnbo_generate_new">生成新的</label></p>';
+                    
+                    echo '<p>注意：<br/>1、生成后无法修改，请谨慎选择；<br/>2、自动替换特色图像；<br/>3、自动保存到媒体库中；<br/>4、勾选"生成新的"将删除现有缩略图并重新生成。</p>';
                 }, 
                 'post', 
                 'side', 
                 'high' 
             );
+        }
+    }
+    
+    /**
+     * 保存文章元数据
+     * 处理缩略图主题设置和"生成新的"选项
+     *
+     * @param int $post_id 文章ID
+     */
+    public function save_metabox( int $post_id ): void {
+        // 检查是否为自动保存
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+            return;
+        }
+        
+        // 检查用户权限
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            return;
+        }
+        
+        // 处理cut_theme设置
+        if ( isset( $_POST['cut_theme'] ) ) {
+            $cut_theme = sanitize_text_field( $_POST['cut_theme'] );
+            update_post_meta( $post_id, 'cut_theme', $cut_theme );
+        }
+        
+        // 处理"生成新的"选项
+        if ( isset( $_POST['thnbo_generate_new'] ) && $_POST['thnbo_generate_new'] === '1' ) {
+            // 删除现有缩略图
+            $this->_delete_thumbnail( $post_id );
+            
+            // 重新生成缩略图
+            $post = get_post( $post_id );
+            if ( $post ) {
+                $this->handle_thumbnail( $post_id, $post );
+            }
         }
     }
     
@@ -117,6 +162,10 @@ class Core {
             $this->_delete_thumbnail( $post_id );
             return;
         }
+        
+        // 获取当前文章的cut_theme设置，并更新属性
+        $post_cut_theme = get_post_meta( $post_id, 'cut_theme', true ) ?: thnbo_get_option( 'cut_theme' );
+        $this->set_cut_theme( $post_cut_theme );
         
         // 仅当主题未关闭时执行
         if ( $this->_cut_theme !== Cut_Theme::CLOSE ) {
